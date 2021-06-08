@@ -335,6 +335,67 @@ def transfer_num(data):  # transfer num into "NUM"
 
     return pairs
 
+def transfer_korean_num(data):  # transfer num into "NUM"
+    print("Transfer numbers...")
+    pattern = re.compile("\d*\(\d+/\d+\)\d*|\d+\.\d+%?|\d+%?")
+    pairs = []
+
+    # count_dict = {}
+    
+    count = 0
+    for d in data:
+        if d["answer"].isdigit():
+            nums = []
+            input_seq = []
+            seg = d["question"].strip().split(" ")
+            answer = d["answer"]
+            fractions = re.findall("\d+\(\d+\/\d+\)", answer)
+            if len(fractions):
+                answer = answer.replace("(", "+(")
+            # equations = d["equation"][2:]
+            count += 1
+            id2 = str(count)
+            i = 0
+            for s in seg:
+                pos = re.search(pattern, s)
+                if pos and pos.start() == 0:
+                    nums.append(s[pos.start(): pos.end()])
+                    input_seq.append("NUM"+str(i))
+                    if pos.end() < len(s):
+                        input_seq.append(s[pos.end():])
+                    i += 1
+                else:
+                    input_seq.append(s)
+            nums_fraction = []
+
+            for num in nums:
+                if re.search("\d*\(\d+/\d+\)\d*", num):
+                    nums_fraction.append(num)
+            nums_fraction = sorted(nums_fraction, key=lambda x: len(x), reverse=True)
+
+            num_pos = []
+            for i, j in enumerate(input_seq):
+                if "NUM" in j:
+                    num_pos.append(i)
+            assert len(nums) == len(num_pos)
+            # pairs.append((input_seq, out_seq, nums, num_pos, d["ans"]))
+
+            pairs.append((input_seq, nums, num_pos, answer, id2))
+        #     string = str(len(nums))
+        #     string2 = str((len(out_seq)))
+        #     if string not in count_dict.keys():
+        #         count_dict[string] = {}
+        #         count_dict[string][string2] = 1
+
+        #     else:
+        #         if string2 not in count_dict[string].keys():
+        #             count_dict[string][string2] = 1
+        #         else:
+        #             count_dict[string][string2] += 1
+
+        # print (count_dict)
+
+    return pairs
 
 def transfer_english_num(data):  # transfer num into "NUM"
     print("Transfer numbers...")

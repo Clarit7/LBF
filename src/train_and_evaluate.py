@@ -154,7 +154,9 @@ def get_all_number_encoder_outputs(encoder_outputs, num_pos, batch_size, num_siz
     all_embedding = all_outputs.view(-1, encoder_outputs.size(2))  # S x B x H -> (B x S) x H
     all_num = all_embedding.index_select(0, indices)
     all_num = all_num.view(batch_size, num_size, hidden_size)
-    return all_num.masked_fill_(masked_index, 0.0)
+    #return all_num.masked_fill_(masked_index, 0.0)
+    all_num[masked_index.bool()] = 0.0
+    return all_num
 
 def copy_list(l):
     r = []
@@ -438,7 +440,7 @@ def train_tree(input_batch, input_length, num_size_batch,
     else:
         num_iteration = int(len(fix_target_list)/mapo_batch_size)
 
-    loss = torch.tensor([[0]])
+    loss = torch.tensor([[0.0]]).to('cuda')
 
     for j in range (num_iteration):
         if not j * mapo_batch_size + mapo_batch_size - 1 < len(fix_target_list):

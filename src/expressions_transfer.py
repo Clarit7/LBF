@@ -104,13 +104,16 @@ def out_expression_list(test, output_lang, num_list):
     for i in test:
         # if i == 0:
         #     return res
-        idx = output_lang.index2word[i]
-        if "NUM" in idx:
-            if int(idx[3:]) >= len(num_list):
-                return None
-            res.append(num_list[int(idx[3:])])
-        else:
-            res.append(idx)
+        try :
+            idx = output_lang.index2word[i]
+            if "NUM" in idx:
+                if int(idx[3:]) >= len(num_list):
+                    return None
+                res.append(num_list[int(idx[3:])])
+            else:
+                res.append(idx)
+        except IndexError:
+            print(output_lang.index2word, i)
     return res
 
 def compute_postfix_expression(post_fix):
